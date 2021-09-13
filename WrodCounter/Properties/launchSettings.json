@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "WrodCounter": {
+      "commandName": "Project",
+      "commandLineArgs": "C:\\Users\\hamid\\Downloads\\sample2.out  C:\\Users\\hamid\\Downloads\\sample4.out"
+    }
+  }
+}
