@@ -12,28 +12,46 @@ namespace WrodCounter
         
         static void Main(string[] args)
         {
-            string pathIn = args[0]; //Full path to file >> C:\XXX\Sample.In
-            string pathOut = args[1]; //Full path to file >> C:\XXX\Sample.Out
+            List<string> outputLines = new List<string>();
+            List<string> inputLines = new List<string>();
 
-            List<string> output = new List<string>();
-            List<string> input=FileReader.Read(pathIn);            
+            GetInput(inputLines);
+            CalculateOutput(outputLines, inputLines);
+            PrintOutput(outputLines);
+        }
 
-            foreach (var line in input)
+        private static void CalculateOutput(List<string> outputLines, List<string> inputLines)
+        {
+            foreach (var line in inputLines)
             {
                 var func = line.Split(' ').FirstOrDefault();
                 switch (func)
-                {                
-                    case "def" : MyDictionary.DefHandler(line); break;                
-                    case "calc": output.Add(MyCalculator.CalcHandler(line)); break;
+                {
+                    case "def": MyDictionary.DefHandler(line); break;
+                    case "calc": outputLines.Add(MyCalculator.CalcHandler(line)); break;
                     case "clear": MyDictionary.ClearTable(); break;
-                    default:break;
-                } 
+                    default: break;
+                }
             }
+        }
 
-            FileReader.Write(pathOut,output);
-        } 
+        private static void PrintOutput(List<string> outputLines)
+        {
+            foreach (var outputLine in outputLines)
+            {
+                Console.WriteLine(outputLine);
+            }
+        }
 
- 
+        private static void GetInput(List<string> inputLines)
+        {
+            string newline = string.Empty;
+            while ((newline = Console.ReadLine()) != null)
+            {
+                inputLines.Add(newline);
+            }
+        }
+
     }
     #region MyCalculator
     public static class MyCalculator
@@ -48,11 +66,11 @@ namespace WrodCounter
         private static string BuildOutputString(string calcLine, int? Total)
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append(@$"{calcLine.Remove(0, 5)}");// Remove 'calc '
+            sb.Append(calcLine.Remove(0, 5));// Remove 'calc '
             if (Total != null)
                 if (MyDictionary.ContainsValue((int)Total))
-                { sb.Append(@$"{MyDictionary.GetKey((int)Total)}"); return sb.ToString(); }
-            sb.Append(@$" unknown");
+                { sb.Append(" "); sb.Append(MyDictionary.GetKey((int)Total)); return sb.ToString(); }
+            sb.Append(" unknown");
             return sb.ToString();
         }
 
@@ -93,7 +111,7 @@ namespace WrodCounter
                 }
                 return total;
             }
-            catch (Exception ex)
+            catch 
             {
                 return null;
             }
@@ -109,18 +127,19 @@ namespace WrodCounter
         public static Dictionary<string, int> VariableList = new Dictionary<string, int>();
         public static void Add(string s, int i) { if (!VariableList.Any(_ => _.Key == s)) VariableList.Add(s, i); else VariableList[s] = i; }
         public static bool ContainsValue(int i) => VariableList.Any(_ => _.Value == i);
-        public static int? GetValue(string s) => (VariableList.Any(_ => _.Key == s)) ? VariableList.Single(_ => _.Key == s).Value : null;
+        public static int? GetValue(string s) => (VariableList.Any(_ => _.Key == s)) ? (int?)VariableList.Single(_ => _.Key == s).Value : null;
         public static string GetKey(int i) => VariableList.Single(_ => _.Value == i).Key;
         public static void ClearTable() => VariableList = new Dictionary<string, int>();
         public static void DefHandler(string item)
         {
             string pattern = @"(def)\s(\w+)\s(-?(1000|[0-9][0-9][0-9]|[0-9][0-9]|[0-9])$)";
             Regex regex = new Regex(pattern, RegexOptions.IgnoreCase);
-            Match m = regex.Match(item);
+            if (!regex.IsMatch(item)) return;
+            Match m =regex.Match(item) ;          
             string alphabeticalValue = m.Groups[2].Value;
             int numericalValue = int.Parse(m.Groups[3].Value);
 
-            VariableList.Add(alphabeticalValue, numericalValue);
+           Add(alphabeticalValue, numericalValue);
 
         }
     }
