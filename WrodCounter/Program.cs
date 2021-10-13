@@ -18,6 +18,7 @@ namespace WrodCounter
             GetInput(inputLines);
             CalculateOutput(outputLines, inputLines);
             PrintOutput(outputLines);
+            Console.WriteLine("process is finished");
         }
 
         private static void CalculateOutput(List<string> outputLines, List<string> inputLines)
